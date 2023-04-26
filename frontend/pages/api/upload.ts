@@ -33,7 +33,20 @@ const handler = async (
         }))
 
         // Do whatever you'd like with the file, since it's already in text
-        console.log(fileContent)
+        var lines = fileContent.split(/\r?\n/);
+        for (var line of lines) {
+            var type = line.substring(0, 1)
+            var date = line.substring(1, 26)
+            var product = line.substring(26, 56)
+            var value = line.substring(56, 66)
+            var seller = line.substring(66, 86)
+
+            console.log(type)
+            console.log(date)
+            console.log(product)
+            console.log(value)
+            console.log(seller)
+        }
 
         res.status(200).send({ message: 'ok' })
     } catch (err) {
