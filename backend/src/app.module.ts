@@ -1,13 +1,28 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TransactionModule } from './transaction/transaction.module';
+import { Transaction } from './transaction/entities/transaction.entity';
+
 
 @Module({
-  imports: [ConfigModule, ConfigModule.forRoot({ envFilePath: ['.env'] }), TransactionModule],
+  imports: [TypeOrmModule.forRootAsync({
+    imports: [ConfigModule],
+    useFactory: (configService: ConfigService) => ({
+      type: 'postgres',
+      host: configService.get('DATABASE_HOST'),
+      port: +configService.get('DATABASE_PORT'),
+      username: configService.get('DATABASE_USER'),
+      password: configService.get('DATABASE_PASSWORD'),
+      database: configService.get('DATABASE_NAME'),
+      entities: [Transaction],
+      synchronize: true,
+    }),
+    inject: [ConfigService]
+  }), TransactionModule, ConfigModule.forRoot({ envFilePath: ['.env'] })],
   controllers: [AppController],
   providers: [AppService],
-
 })
 export class AppModule { }
