@@ -17,8 +17,8 @@ export default function Creators({ result }: InferGetServerSidePropsType<typeof 
   return (
     <>
       <Head>
-        <title>Affiliates</title>
-        <meta name="description" content="Affiliates" />
+        <title>Creators</title>
+        <meta name="description" content="Creators" />
       </Head>
       <Navbar />
       <main>
