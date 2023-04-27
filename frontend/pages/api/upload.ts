@@ -42,11 +42,19 @@ const handler = async (
                 var value = line.substring(56, 66)
                 var seller = line.substring(66, 86)
 
-                console.log(type)
-                console.log(date)
-                console.log(product)
-                console.log(value)
-                console.log(seller)
+                const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/transaction/`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: type,
+                        date: date,
+                        product: product,
+                        value: value,
+                        seller: seller
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
             }
         }
 
