@@ -1,12 +1,24 @@
 import Navbar from '@/components/navbar'
 import Head from 'next/head'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
-export default function Creators() {
+type Transaction = {
+  type: number
+  value: number
+  seller: string
+}
+
+interface Result {
+  [name: string]: number;
+}
+
+export default function Creators({ result }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
   return (
     <>
       <Head>
-        <title>Creators</title>
-        <meta name="description" content="Creators" />
+        <title>Affiliates</title>
+        <meta name="description" content="Affiliates" />
       </Head>
       <Navbar />
       <main>
@@ -23,34 +35,44 @@ export default function Creators() {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  Microsoft Surface Pro
-                </th>
-                <td className="px-6 py-4">
-                  $1999
-                </td>
-              </tr>
-              <tr className="bg-white dark:bg-gray-800">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  Magic Mouse 2
-                </th>
-                <td className="px-6 py-4">
-                  $99
-                </td>
-              </tr>
+              {Object.keys(result).map((name, id) => {
+                return (
+                  <tr key={id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td className="px-6 py-4">
+                      {name}
+                    </td>
+                    <td className="px-6 py-4">
+                      R$ {result[name] / 100}
+                    </td>
+
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
       </main>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/transaction`)
+  const transactions: Transaction[] = await res.json()
+
+  const result: Result = transactions.reduce((accumulator: Result, currentValue: Transaction) => {
+    const { seller, value } = currentValue;
+    if (currentValue.type === 1) {
+      accumulator[seller] = (accumulator[seller] || 0) + value;
+    } else if (currentValue.type === 3) {
+      accumulator[seller] = (accumulator[seller] || 0) - value;
+    }
+    return accumulator;
+  }, {});
+
+  return {
+    props: {
+      result,
+    },
+  }
 }
