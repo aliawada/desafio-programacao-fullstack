@@ -7,7 +7,7 @@ type Transaction = {
     date: Date
     product: string
     value: number
-    seller: number
+    seller: string
 }
 
 export default function Transactions({ transactions }: InferGetServerSidePropsType<typeof getServerSideProps>) {
